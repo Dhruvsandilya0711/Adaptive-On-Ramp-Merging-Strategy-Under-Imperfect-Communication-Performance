@@ -163,19 +163,6 @@ python src/main_new_network.py --mode evaluate --gui
 
 Department of Computer Science and Engineering, National Institute of Technology Karnataka, Surathkal
 
-## License & Citation
-
-MIT License. Please cite this work as:
-
-```bibtex
-@software{Prajapati2025AORMS,
-  title = {Adaptive On-Ramp Merging Strategy Under Imperfect Communication Performance},
-  author = {Prajapati, Dev and Sandilya, Dhruv and Honnavalli, Vrishank and Nair, Advaith},
-  year = {2025},
-  institution = {NITK Surathkal}
-}
-```
-
 ## Contact
 
 For questions, issues, or collaboration inquiries, please contact the development team or open a GitHub issue with descriptive details about your question or finding.
