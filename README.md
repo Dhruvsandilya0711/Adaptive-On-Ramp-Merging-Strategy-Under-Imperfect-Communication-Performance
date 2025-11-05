@@ -39,9 +39,7 @@ Where $\alpha = 0.4$ exponential decay factor prioritizes information from neare
 
 Implements stochastic V2V channel with 30% packet loss probability, Age-of-Information tracking per vehicle, and kinematic motion prediction for lost packets. Position prediction model:
 
-\[
-p_{pred} = p_{recv} + v \cdot t_{AoI} + \frac{1}{2}a \cdot t_{AoI}^2
-\]
+$$p_{pred} = p_{recv} + v \cdot t_{AoI} + \frac{1}{2}a \cdot t_{AoI}^2$$
 
 This creates realistic conditions for evaluating algorithm robustness beyond idealized assumptions.
 
@@ -58,7 +56,7 @@ Vehicle dynamics: maximum speed 30 m/s, acceleration 2.6 m/s², deceleration -4.
 
 ### Training Configuration
 
-Multi-agent framework with synchronized execution ensures identical environmental conditions across all agents. Separate neural networks and replay buffers (100K capacity, 64 batch size) enable parallel training without interference. DDPG agents use soft target updates (\(\tau = 0.001\)), DQN hard updates every 20 episodes. Training spans 2,000 episodes with model checkpointing every 50 episodes.
+Multi-agent framework with synchronized execution ensures identical environmental conditions across all agents. Separate neural networks and replay buffers (100K capacity, 64 batch size) enable parallel training without interference. DDPG agents use soft target updates ($\tau = 0.001$), DQN hard updates every 20 episodes. Training spans 2,000 episodes with model checkpointing every 50 episodes.
 
 ### Neural Network Architectures
 
@@ -162,6 +160,3 @@ python src/main_new_network.py --mode evaluate --gui
 
 Department of Computer Science and Engineering, National Institute of Technology Karnataka, Surathkal
 
-## Contact
-
-For questions, issues, or collaboration inquiries, please contact the development team or open a GitHub issue with descriptive details about your question or finding.
