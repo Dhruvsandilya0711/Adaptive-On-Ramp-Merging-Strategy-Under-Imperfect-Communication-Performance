@@ -1,4 +1,4 @@
-# Adaptive On Ramp Merging Strategy Under Imperfect Communication Performance
+# Adaptive On-Ramp Merging Strategy Under Imperfect Communication Performance
 
 ## Executive Summary
 
@@ -26,10 +26,20 @@ This implementation systematically addresses: How do different reinforcement lea
 
 3. **Agent J3 (DQN)**: 14-dimensional state space with discrete 3-action space (accelerate, hold, decelerate). Provides robustness through simplified action selection at cost of fine-grained control.
 
+### Comparison of Three Multi-Agent Algorithms
+
+| Parameter | Agent J1 (E-AoI-DDPG) | Agent J2 (Vanilla DDPG) | Agent J3 (DQN) |
+|-----------|----------------------|-------------------------|-----------------|
+| **State Dimension** | 15D (includes E-AoI) | 14D (no E-AoI) | 14D (no E-AoI) |
+| **Action Space** | Continuous jerk control [-3,3] m/s³ | Continuous jerk control [-3,3] m/s³ | Discrete: Accel/Hold/Decel |
+| **Communication Awareness** | Yes (E-AoI metric) | No | No |
+| **Primary Advantage** | Adaptive to communication quality; reduces speed under packet loss | Smooth continuous control; high efficiency in good conditions | Simple discrete actions; robust through conservatism |
+| **Primary Weakness** | Slightly higher state complexity | Vulnerable to persistent packet loss | Discrete actions limit fine control |
+| **Best Use Case** | High packet loss scenarios (20-40%) | Perfect/near-perfect communication | Conservative safety-first operations |
+
 ### Exponentially Weighted Average Age-of-Information (E-AoI)
 
 Novel communication quality metric that weights information age by vehicle proximity:
-
 
 $$\text{E-AoI} = \frac{\sum_{l=1}^{n} \alpha^l \Delta_l}{\sum_{l=1}^{n} \alpha^l \cdot \Delta_{max}}$$
 
@@ -45,6 +55,39 @@ This creates realistic conditions for evaluating algorithm robustness beyond ide
 
 ## System Architecture
 
+### Training System Workflow
+
+![System Workflow Diagram](sys_wflw.jpg)
+
+The system follows a comprehensive training loop incorporating:
+- Environment setup and SUMO simulation initialization
+- State observation collection (V2V data + AoI metrics)
+- State vector construction for each agent
+- Agent-specific action selection (DDPG continuous vs DQN discrete)
+- SUMO execution and step rewards
+- Terminal condition evaluation and episode completion handling
+- Network updates and replay buffer management
+- Iterative training across 200 episodes with regular model checkpointing
+
+### Training Configuration
+
+| Parameter | DDPG (J1, J2) | DQN (J3) |
+|-----------|----------------|----------|
+| **Discount factor (γ)** | 0.99 | 0.99 |
+| **Actor learning rate** | 1 × 10⁻⁴ | — |
+| **Critic learning rate** | 1 × 10⁻³ | — |
+| **Q-network learning rate** | — | 1 × 10⁻⁴ |
+| **Replay buffer size** | 100,000 | 100,000 |
+| **Batch size** | 64 | 64 |
+| **Soft update factor (τ)** | 0.001 | — |
+| **Target update frequency** | — | 20 episodes |
+| **Epsilon decay rate** | — | 30,000 steps |
+| **Epsilon range** | — | 1.0 → 0.05 |
+| **Action bound (jerk)** | ±3.0 m/s³ | — |
+| **Total training episodes** | 200 |
+| **Maximum episode length** | 1,000 steps (200 s) |
+| **Control frequency** | 5 Hz (0.2 s per step) |
+
 ### Multi-Junction SUMO Environment
 
 Complex road network with three distinct merging junctions:
@@ -53,10 +96,6 @@ Complex road network with three distinct merging junctions:
 - **J3**: Secondary southbound merge from sub_ramp_S to ramp_S
 
 Vehicle dynamics: maximum speed 30 m/s, acceleration 2.6 m/s², deceleration -4.5 m/s², 5 Hz control frequency (0.2 s steps), 200 second maximum episode length.
-
-### Training Configuration
-
-Multi-agent framework with synchronized execution ensures identical environmental conditions across all agents. Separate neural networks and replay buffers (100K capacity, 64 batch size) enable parallel training without interference. DDPG agents use soft target updates ($\tau = 0.001$), DQN hard updates every 20 episodes. Training spans 200 episodes with model checkpointing every 50 episodes.
 
 ### Neural Network Architectures
 
