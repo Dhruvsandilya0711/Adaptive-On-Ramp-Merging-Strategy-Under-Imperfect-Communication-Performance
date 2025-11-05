@@ -167,20 +167,6 @@ python src/main_new_network.py --mode evaluate --gui
 
 4. **Fair comparison framework enabled by multi-agent synchronization**: Unified environment with identical conditions provides robust comparative evidence.
 
-## Limitations & Future Directions
-
-**Current Limitations:**
-- Agents trained on specific traffic densities; generalization requires domain randomization
-- Single merging vehicle per junction; real-world scenarios need multi-vehicle coordination
-- Fixed 30% packet loss; real communication varies spatially and temporally
-- Simplified vehicle dynamics without actuator delays or friction limits
-
-**Future Improvements:**
-- Adaptive communication modeling with distance/density dependence
-- Explicit multi-agent coordination protocols
-- Curriculum learning from simple to complex scenarios
-- Formal safety verification integration
-- Real-world V2X testbed deployment
 
 ## References
 
