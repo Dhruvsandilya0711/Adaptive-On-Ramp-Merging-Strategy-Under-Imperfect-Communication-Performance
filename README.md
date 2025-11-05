@@ -1,1 +1,181 @@
 # Adaptive-On-Ramp-Merging-Strategy-Under-Imperfect-Communication-Performance
+
+## Executive Summary
+
+This repository presents a comprehensive implementation and comparative analysis of adaptive on-ramp merging strategies for connected and automated vehicles (CAVs) under imperfect communication conditions. The project implements three distinct reinforcement learning algorithms—E-AoI-aware DDPG, Vanilla DDPG, and DQN—operating simultaneously in a complex multi-junction highway simulation. The work demonstrates that explicitly modeling communication quality metrics into the state representation enables robust adaptive behaviors that maintain safety and efficiency despite persistent packet loss and communication delays characteristic of real-world V2X networks.
+
+## Problem Context & Motivation
+
+### Research Challenge
+
+Existing on-ramp merging algorithms typically assume perfect communication, a critical assumption rarely met in real-world deployments. Communication imperfections—packet loss, variable delays, and information staleness—directly impact autonomous vehicle safety and efficiency. This creates three interconnected challenges: (1) safety hazards from outdated or missing vehicle information, (2) control instability from unreliable state observations, and (3) efficiency degradation from suboptimal merging decisions.
+
+### Key Research Questions
+
+This implementation systematically addresses: How do different reinforcement learning architectures perform under realistic communication constraints? Does incorporating communication quality metrics into state representations provide tangible safety benefits? What are the trade-offs between continuous control (DDPG) and discrete control (DQN) in communication-constrained scenarios?
+
+## Technical Contributions
+
+### Multi-Agent Framework
+
+**Three Algorithms Compared:**
+
+1. **Agent J1 (E-AoI-DDPG)**: 15-dimensional state space incorporating Exponentially Weighted Average Age-of-Information metric. Couples speed reduction with elevated E-AoI through specialized reward term: \(r_{comm} = -\text{E-AoI} \times (v_{ego}/v_{max})\). Enables communication-aware adaptive control.
+
+2. **Agent J2 (Vanilla DDPG)**: 14-dimensional state space without communication awareness. Uses identical continuous jerk action space as Agent J1 but lacks communication penalty term. Serves as baseline for demonstrating communication-awareness benefits.
+
+3. **Agent J3 (DQN)**: 14-dimensional state space with discrete 3-action space (accelerate, hold, decelerate). Provides robustness through simplified action selection at cost of fine-grained control.
+
+### Exponentially Weighted Average Age-of-Information (E-AoI)
+
+Novel communication quality metric that weights information age by vehicle proximity:
+
+\[
+\text{E-AoI} = \frac{\sum_{l=1}^{n} \alpha^l \Delta_l}{\sum_{l=1}^{n} \alpha^l \cdot \Delta_{max}}
+\]
+
+Where \(\alpha = 0.4\) exponential decay factor prioritizes information from nearest vehicles. Range [0, 1] maps perfect communication (0) to severe packet loss (1). Distance weighting ensures critical near-field information dominates decisions.
+
+### Realistic Communication Simulation
+
+Implements stochastic V2V channel with 30% packet loss probability, Age-of-Information tracking per vehicle, and kinematic motion prediction for lost packets. Position prediction model:
+
+\[
+p_{pred} = p_{recv} + v \cdot t_{AoI} + \frac{1}{2}a \cdot t_{AoI}^2
+\]
+
+This creates realistic conditions for evaluating algorithm robustness beyond idealized assumptions.
+
+## System Architecture
+
+### Multi-Junction SUMO Environment
+
+Complex road network with three distinct merging junctions:
+- **J1**: Southbound merge from ramp_S to main_S
+- **J2**: Northbound merge from ramp_N to main_N  
+- **J3**: Secondary southbound merge from sub_ramp_S to ramp_S
+
+Vehicle dynamics: maximum speed 30 m/s, acceleration 2.6 m/s², deceleration -4.5 m/s², 5 Hz control frequency (0.2 s steps), 200 second maximum episode length.
+
+### Training Configuration
+
+Multi-agent framework with synchronized execution ensures identical environmental conditions across all agents. Separate neural networks and replay buffers (100K capacity, 64 batch size) enable parallel training without interference. DDPG agents use soft target updates (\(\tau = 0.001\)), DQN hard updates every 20 episodes. Training spans 2,000 episodes with model checkpointing every 50 episodes.
+
+### Neural Network Architectures
+
+**DDPG Networks (Agents J1, J2):**
+- Actor: Linear(state_dim, 256) → ReLU → Linear(256, 128) → ReLU → Linear(128, 1)
+- Critic: Parallel state path Linear(state_dim, 256) → ReLU, concatenated with action, fused through Linear(257, 128) → ReLU → Linear(128, 1)
+
+**DQN Network (Agent J3):**
+- Linear(state_dim, 128) → ReLU → Linear(128, 128) → ReLU → Linear(128, 3) for Q-values
+
+## Experimental Results
+
+### Safety Performance
+
+Agent J1 demonstrates superior collision avoidance through communication-adaptive control. When E-AoI increases due to packet loss, J1 proactively reduces speed maintaining safe margins. Agent J2 exhibits increased collision risk during persistent packet loss, lacking information staleness awareness. Agent J3's discrete action space provides robustness through conservative behavior but reduces efficiency.
+
+### Communication Impact
+
+E-AoI values during episodes range 0.0 (perfect communication) to ~1.0 (severe loss). Distance-weighted formulation ensures nearest vehicles' packet loss has strongest influence. The communication penalty term successfully trains J1 to couple speed reduction with elevated E-AoI, achieving adaptive behavior without explicit programming.
+
+### Trajectory Characteristics
+
+Successful merges reveal distinct patterns: Agent J1 shows smooth gradual adjustments based on traffic and E-AoI; Agent J2 demonstrates aggressive speed maintenance with sharper adjustments; Agent J3 exhibits stepwise discrete changes. Critical packet loss scenarios highlight J1's preemptive speed reduction, J2's risky continued aggression, and J3's inherent conservatism with longer merge times.
+
+## Implementation Framework
+
+### Repository Structure
+
+```
+adaptive-merging-strategy/
+├── src/
+│   ├── main_new_network.py          # Training/evaluation entry point
+│   ├── agents/                      # J1 E-AoI-DDPG, J2 DDPG, J3 DQN
+│   ├── environment/                 # SUMO integration, V2V simulator
+│   └── utils/                       # Metrics, logging, visualization
+├── sumo_config/
+│   ├── Test2.net.xml               # Network topology
+│   └── test2_agents.rou.xml        # Route definitions
+├── models/                          # Checkpointed model weights
+├── results/                         # Training metrics, logs
+├── docs/
+│   ├── report.tex                  # Full technical report
+│   └── presentations/              # PPTX slides
+└── README.md
+```
+
+### Setup & Execution
+
+```bash
+# Environment setup
+pip install torch numpy matplotlib scipy
+export SUMO_HOME=/usr/share/sumo  # Linux
+# or set SUMO_HOME=C:\Program Files\SUMO  # Windows
+
+# Training
+python src/main_new_network.py --mode train --episodes 2000
+
+# Evaluation with visualization
+python src/main_new_network.py --mode evaluate --gui
+```
+
+## Key Findings
+
+1. **Communication awareness improves safety**: E-AoI-DDPG demonstrates adaptive control reducing collision risk compared to communication-agnostic approaches under 30% packet loss.
+
+2. **Continuous control outperforms discrete**: DDPG algorithms produce smoother trajectories than DQN, important for passenger comfort in safety-critical applications.
+
+3. **Reward shaping is critical**: Communication penalty term successfully trains desired adaptive behavior, demonstrating reward function design importance.
+
+4. **Fair comparison framework enabled by multi-agent synchronization**: Unified environment with identical conditions provides robust comparative evidence.
+
+## Limitations & Future Directions
+
+**Current Limitations:**
+- Agents trained on specific traffic densities; generalization requires domain randomization
+- Single merging vehicle per junction; real-world scenarios need multi-vehicle coordination
+- Fixed 30% packet loss; real communication varies spatially and temporally
+- Simplified vehicle dynamics without actuator delays or friction limits
+
+**Future Improvements:**
+- Adaptive communication modeling with distance/density dependence
+- Explicit multi-agent coordination protocols
+- Curriculum learning from simple to complex scenarios
+- Formal safety verification integration
+- Real-world V2X testbed deployment
+
+## References
+
+- Tong et al., "Adaptive on-ramp merging strategy under imperfect communication performance," *Vehicular Communications*, vol. 44, 2023
+- Lillicrap et al., "Continuous control with deep reinforcement learning," ICLR 2016
+- Mnih et al., "Human-level control through deep reinforcement learning," *Nature*, vol. 518, 2015
+- Lopez et al., "Microscopic traffic simulation using SUMO," ITSC 2018
+- Yates et al., "Age of information: an introduction and survey," *IEEE J-SAC*, vol. 39, 2021
+
+## Team
+
+- **Dev Prajapati** (231CS120)
+- **Dhruv Sandilya** (231CS122)
+- **Vrishank Honnavalli** (231CS165)
+- **Advaith Nair** (231CS205)
+
+Department of Computer Science and Engineering, National Institute of Technology Karnataka, Surathkal
+
+## License & Citation
+
+MIT License. Please cite this work as:
+
+```bibtex
+@software{Prajapati2025AORMS,
+  title = {Adaptive On-Ramp Merging Strategy Under Imperfect Communication Performance},
+  author = {Prajapati, Dev and Sandilya, Dhruv and Honnavalli, Vrishank and Nair, Advaith},
+  year = {2025},
+  institution = {NITK Surathkal}
+}
+```
+
+## Contact
+
+For questions, issues, or collaboration inquiries, please contact the development team or open a GitHub issue with descriptive details about your question or finding.
