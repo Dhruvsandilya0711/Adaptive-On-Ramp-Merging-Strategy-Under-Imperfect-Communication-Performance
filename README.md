@@ -20,7 +20,7 @@ This implementation systematically addresses: How do different reinforcement lea
 
 **Three Algorithms Compared:**
 
-1. **Agent J1 (E-AoI-DDPG)**: 15-dimensional state space incorporating Exponentially Weighted Average Age-of-Information metric. Couples speed reduction with elevated E-AoI through specialized reward term: \(r_{comm} = -\text{E-AoI} \times (v_{ego}/v_{max})\). Enables communication-aware adaptive control.
+1. **Agent J1 (E-AoI-DDPG)**: 15-dimensional state space incorporating Exponentially Weighted Average Age-of-Information metric. Couples speed reduction with elevated E-AoI through specialized reward term: $$r_{comm} = -\text{E-AoI} \times (v_{ego}/v_{max})$$. Enables communication-aware adaptive control.
 
 2. **Agent J2 (Vanilla DDPG)**: 14-dimensional state space without communication awareness. Uses identical continuous jerk action space as Agent J1 but lacks communication penalty term. Serves as baseline for demonstrating communication-awareness benefits.
 
