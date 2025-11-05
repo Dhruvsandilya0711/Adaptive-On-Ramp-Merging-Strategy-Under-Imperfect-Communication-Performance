@@ -30,11 +30,10 @@ This implementation systematically addresses: How do different reinforcement lea
 
 Novel communication quality metric that weights information age by vehicle proximity:
 
-\[
-\text{E-AoI} = \frac{\sum_{l=1}^{n} \alpha^l \Delta_l}{\sum_{l=1}^{n} \alpha^l \cdot \Delta_{max}}
-\]
 
-Where \(\alpha = 0.4\) exponential decay factor prioritizes information from nearest vehicles. Range [0, 1] maps perfect communication (0) to severe packet loss (1). Distance weighting ensures critical near-field information dominates decisions.
+$$\text{E-AoI} = \frac{\sum_{l=1}^{n} \alpha^l \Delta_l}{\sum_{l=1}^{n} \alpha^l \cdot \Delta_{max}}$$
+
+Where $\alpha = 0.4$ exponential decay factor prioritizes information from nearest vehicles. Range [0, 1] maps perfect communication (0) to severe packet loss (1). Distance weighting ensures critical near-field information dominates decisions.
 
 ### Realistic Communication Simulation
 
