@@ -127,18 +127,16 @@ Successful merges reveal distinct patterns: Agent J1 shows smooth gradual adjust
 ```
 adaptive-merging-strategy/
 ├── src/
-│   ├── main_new_network.py          # Training/evaluation entry point
-│   ├── agents/                      # J1 E-AoI-DDPG, J2 DDPG, J3 DQN
-│   ├── environment/                 # SUMO integration, V2V simulator
-│   └── utils/                       # Metrics, logging, visualization
+│   └── main_new_network.py        
 ├── sumo_config/
-│   ├── Test2.net.xml               # Network topology
-│   └── test2_agents.rou.xml        # Route definitions
-├── models/                          # Checkpointed model weights
-├── results/                         # Training metrics, logs
+|   ├── test2.sumocfg
+│   ├── Test2.net.xml               
+│   └── test2.rou.xml        
+├── models/                        
+├── results/                         
 ├── docs/
-│   ├── report.tex                  # Full technical report
-│   └── presentations/              # PPTX slides
+│   ├── report.tex                  
+│   └── presentation.pptx
 └── README.md
 ```
 
@@ -151,7 +149,7 @@ export SUMO_HOME=/usr/share/sumo  # Linux
 # or set SUMO_HOME=C:\Program Files\SUMO  # Windows
 
 # Training
-python src/main_new_network.py --mode train --episodes 200
+python src/main_new_network.py --mode train
 
 # Evaluation with visualization
 python src/main_new_network.py --mode evaluate --gui
