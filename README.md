@@ -56,7 +56,7 @@ Vehicle dynamics: maximum speed 30 m/s, acceleration 2.6 m/s², deceleration -4.
 
 ### Training Configuration
 
-Multi-agent framework with synchronized execution ensures identical environmental conditions across all agents. Separate neural networks and replay buffers (100K capacity, 64 batch size) enable parallel training without interference. DDPG agents use soft target updates ($\tau = 0.001$), DQN hard updates every 20 episodes. Training spans 2,000 episodes with model checkpointing every 50 episodes.
+Multi-agent framework with synchronized execution ensures identical environmental conditions across all agents. Separate neural networks and replay buffers (100K capacity, 64 batch size) enable parallel training without interference. DDPG agents use soft target updates ($\tau = 0.001$), DQN hard updates every 20 episodes. Training spans 200 episodes with model checkpointing every 50 episodes.
 
 ### Neural Network Architectures
 
@@ -112,7 +112,7 @@ export SUMO_HOME=/usr/share/sumo  # Linux
 # or set SUMO_HOME=C:\Program Files\SUMO  # Windows
 
 # Training
-python src/main_new_network.py --mode train --episodes 2000
+python src/main_new_network.py --mode train --episodes 200
 
 # Evaluation with visualization
 python src/main_new_network.py --mode evaluate --gui
