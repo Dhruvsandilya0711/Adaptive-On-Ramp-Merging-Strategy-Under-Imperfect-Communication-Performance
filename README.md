@@ -57,7 +57,7 @@ This creates realistic conditions for evaluating algorithm robustness beyond ide
 
 ### Training System Workflow
 
-![System Workflow Diagram](sys_wflw.jpg)
+<img width="240" height="1000" alt="Image" src="https://github.com/user-attachments/assets/50e89ae5-a2ef-4fdb-b875-dd92fc1c2fc0" />
 
 The system follows a comprehensive training loop incorporating:
 - Environment setup and SUMO simulation initialization
