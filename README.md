@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-This repository presents a comprehensive implementation and comparative analysis of adaptive on-ramp merging strategies for connected and automated vehicles (CAVs) under imperfect communication conditions. The project implements three distinct reinforcement learning algorithms—E-AoI-aware DDPG, Vanilla DDPG, and DQN—operating simultaneously in a complex multi-junction highway simulation. The work demonstrates that explicitly modeling communication quality metrics into the state representation enables robust adaptive behaviors that maintain safety and efficiency despite persistent packet loss and communication delays characteristic of real-world V2X networks.
+This repository presents a comprehensive implementation and comparative analysis of adaptive on-ramp merging strategies for connected and automated vehicles (CAVs) under imperfect communication conditions. The project implements three distinct reinforcement learning algorithms—E-AoI-aware DDPG, Vanilla DDPG, and DQN—operating simultaneously in a complex multi-junction highway simulation. The work demonstrates that explicitly modeling communication quality metrics into the state representation enables robust adaptive behaviors that maintain safety and efficiency despite persistent packet loss and communication delay characteristic of real-world V2X networks.
 
 ## Problem Context & Motivation
 
